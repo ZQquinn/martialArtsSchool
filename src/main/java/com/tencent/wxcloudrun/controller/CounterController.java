@@ -1,5 +1,8 @@
 package com.tencent.wxcloudrun.controller;
 
+import com.tencent.wxcloudrun.common.aop.PassToken;
+import com.tencent.wxcloudrun.common.entity.JsonResult;
+import com.tencent.wxcloudrun.utils.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tencent.wxcloudrun.config.ApiResponse;
@@ -29,6 +32,12 @@ public class CounterController {
   public CounterController(@Autowired CounterService counterService) {
     this.counterService = counterService;
     this.logger = LoggerFactory.getLogger(CounterController.class);
+  }
+
+  @GetMapping(value = "/api/getToken")
+  @PassToken
+  public JsonResult getToken(){
+      return JsonResult.success(JwtUtils.createToken("1","2","3"));
   }
 
 
