@@ -24,6 +24,9 @@ public class AlumniCard implements Serializable {
       @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    @ApiModelProperty("校友卡")
+    private Long cardId;
+
     @ApiModelProperty("性别")
     private Integer sex;
 

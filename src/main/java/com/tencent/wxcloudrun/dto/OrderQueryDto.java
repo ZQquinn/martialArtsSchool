@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 public class OrderQueryDto extends PageQuery<Order> {
 
+    private String outTradeNo;
 
 }

@@ -32,14 +32,9 @@ mybatis-plus:
     map-underscore-to-camel-case: true
   type-enums-package: com.tencent.wxcloudrun.enums
 
-wx:
-  miniapp:
-    configs:
-      - appid: #微信小程序的appid
-        secret: #微信小程序的Secret
 
 wxpay:
-  appId: u5E94\u7528\u7F16\u53F7
+  appId: wx40aef2a640a5077a
   keyPath: key.pem
   certPath: cert.pem
   certP12Path: cert.p12

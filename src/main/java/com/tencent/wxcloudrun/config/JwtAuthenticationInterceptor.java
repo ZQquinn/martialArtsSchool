@@ -62,15 +62,14 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
                 throw new BizException("此功能仅限注册用户");
             }
 
-            LocalCache.put("userId",userId.toString());
-
             // 验证 token
             JwtUtils.verifyToken(token);
 
             //获取载荷内容
             String openId = JwtUtils.getClaimByName(token, "openId").asString();
 //            String realName = JwtUtils.getClaimByName(token, "realName").asString();
-
+            LocalCache.put("openId",openId);
+            LocalCache.put("userId",userId.toString());
             //放入attribute以便后面调用
             httpServletRequest.setAttribute("openId", openId);
 //            httpServletRequest.setAttribute("realName", realName);
