@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -17,6 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("alumni_card")
 @ApiModel(value = "AlumniCard对象", description = "校友卡")
+@Data
 public class AlumniCard implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,69 +51,7 @@ public class AlumniCard implements Serializable {
     private Integer userId;
 
 
-    public Integer getId() {
-        return id;
-    }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getSex() {
-        return sex;
-    }
-
-    public void setSex(Integer sex) {
-        this.sex = sex;
-    }
-
-    public String getCardType() {
-        return cardType;
-    }
-
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
-    }
-
-    public String getCardNo() {
-        return cardNo;
-    }
-
-    public void setCardNo(String cardNo) {
-        this.cardNo = cardNo;
-    }
-
-    public String getGraduateImg() {
-        return graduateImg;
-    }
-
-    public void setGraduateImg(String graduateImg) {
-        this.graduateImg = graduateImg;
-    }
-
-    public String getDegreeImg() {
-        return degreeImg;
-    }
-
-    public void setDegreeImg(String degreeImg) {
-        this.degreeImg = degreeImg;
-    }
-
-    public String getCardImg() {
-        return cardImg;
-    }
-
-    public void setCardImg(String cardImg) {
-        this.cardImg = cardImg;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
 
     @Override
     public String toString() {
