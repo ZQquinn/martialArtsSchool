@@ -1,9 +1,14 @@
 package com.tencent.wxcloudrun.config;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencent.wxcloudrun.common.aop.PassToken;
+import com.tencent.wxcloudrun.entity.UserInfo;
 import com.tencent.wxcloudrun.exception.BizException;
 import com.tencent.wxcloudrun.exception.CommonEnum;
+import com.tencent.wxcloudrun.mapper.UserInfoMapper;
 import com.tencent.wxcloudrun.utils.JwtUtils;
+import com.tencent.wxcloudrun.utils.LocalCache;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -13,6 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public class JwtAuthenticationInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    private UserInfoMapper userInfoMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object object) throws Exception {
@@ -44,26 +52,28 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
             }
 
             // 获取 token 中的 user Name
-            String userId = JwtUtils.getAudience(token);
+            Integer userId = JwtUtils.getAudience(token);
 
             //找找看是否有这个user   因为我们需要检查用户是否存在，读者可以自行修改逻辑
-//            AccountDTO user = accountService.getByUserName(userId);
+            boolean exists = userInfoMapper.exists(new QueryWrapper<UserInfo>().lambda().eq(UserInfo::getId, userId));
 
-//            if (user == null) {
-//                //这个错误也是我自定义的
-//                throw new UserNotExist();
-//            }
+            if (!exists) {
+                //这个错误也是我自定义的
+                throw new BizException("此功能仅限注册用户");
+            }
+
+            LocalCache.put("userId",userId.toString());
 
             // 验证 token
             JwtUtils.verifyToken(token);
 
             //获取载荷内容
-            String userName = JwtUtils.getClaimByName(token, "userName").asString();
-            String realName = JwtUtils.getClaimByName(token, "realName").asString();
+            String openId = JwtUtils.getClaimByName(token, "openId").asString();
+//            String realName = JwtUtils.getClaimByName(token, "realName").asString();
 
             //放入attribute以便后面调用
-            httpServletRequest.setAttribute("userName", userName);
-            httpServletRequest.setAttribute("realName", realName);
+            httpServletRequest.setAttribute("openId", openId);
+//            httpServletRequest.setAttribute("realName", realName);
 
 
             return true;

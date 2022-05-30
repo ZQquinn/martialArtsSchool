@@ -54,4 +54,10 @@ public class JsonResult<T> implements Serializable {
         result.setData(data);
         return result;
     }
+
+    public static <T> JsonResult<T> error(CommonEnum resultCode) {
+        JsonResult<T> result = new JsonResult<>();
+        result.setResultCode(resultCode);
+        return result;
+    }
 }

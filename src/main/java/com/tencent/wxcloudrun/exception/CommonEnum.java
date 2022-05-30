@@ -16,6 +16,10 @@ public enum CommonEnum implements BaseErrorInfoInterface{
     TOKEN_PARSING_FAILED(10003, "token解析失败"),
     TOKEN_CHECK_FAILED(10003, "token验证失败"),
 
+
+    NO_REGISTER(10004, "此功能仅限注册用户"),
+    NO_ALLOW_CHECK(10005, "对方很含羞隐藏了信息"),
+
     ;
 
     /** 错误码 */
@@ -31,12 +35,12 @@ public enum CommonEnum implements BaseErrorInfoInterface{
 
     @Override
     public int getResultCode() {
-        return 0;
+        return this.resultCode;
     }
 
     @Override
     public String getResultMsg() {
-        return null;
+        return this.resultMsg;
     }
 
 

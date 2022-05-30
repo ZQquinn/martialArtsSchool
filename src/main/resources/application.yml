@@ -26,13 +26,26 @@ spring:
       suffix: .html
       prefix: /
 
-mybatis:
+mybatis-plus:
   mapper-locations: classpath*:mapper/*Mapper.xml
   configuration:
     map-underscore-to-camel-case: true
+  type-enums-package: com.tencent.wxcloudrun.enums
 
 wx:
   miniapp:
     configs:
       - appid: #微信小程序的appid
         secret: #微信小程序的Secret
+
+wxpay:
+  appId: u5E94\u7528\u7F16\u53F7
+  keyPath: key.pem
+  certPath: cert.pem
+  certP12Path: cert.p12
+  platformCertPath: wx_cert.pem
+  mchId: 1625995235
+  apiKey3: Api-v3 \u5BC6\u94A5
+  apiKey: Api \u5BC6\u94A5
+  domain: https://ijpay.javen.com
+

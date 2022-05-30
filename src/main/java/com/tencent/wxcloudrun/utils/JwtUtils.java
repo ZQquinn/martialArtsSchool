@@ -32,7 +32,7 @@ public class JwtUtils {
      载荷内容：暂时设计为：这个人的名字，这个人的昵称
      加密密钥：这个人的id加上一串字符串
      */
-    public static String createToken(String userId,String realName, String userName) {
+    public static String createToken(String userId,String openId) {
 
         Calendar nowTime = Calendar.getInstance();
         nowTime.add(Calendar.MINUTE,2*60);
@@ -42,8 +42,8 @@ public class JwtUtils {
                 .withIssuedAt(new Date())    //发行时间
                 .withIssuer(JwtUtils.ISSUER)
                 .withExpiresAt(expiresDate)  //有效时间
-                .withClaim("userName", userName)    //载荷，随便写几个都可以
-                .withClaim("realName", realName)
+                .withClaim("openId", openId)    //载荷，随便写几个都可以
+//                .withClaim("realName", realName)
                 .sign(Algorithm.HMAC256(JwtUtils.KEY));   //加密
     }
 
@@ -65,12 +65,12 @@ public class JwtUtils {
     }
 
     /**
-     * 获取签发对象
+     * 获取签发对象 userId
      */
-    public static String getAudience(String token)  {
-        String audience = null;
+    public static Integer getAudience(String token)  {
+        Integer audience = null;
         try {
-            audience = JWT.decode(token).getAudience().get(0);
+            audience = Integer.parseInt(JWT.decode(token).getAudience().get(0));
         } catch (JWTDecodeException j) {
             //这里是token解析失败
             throw new BizException(CommonEnum.TOKEN_PARSING_FAILED);
