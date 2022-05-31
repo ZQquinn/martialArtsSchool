@@ -52,13 +52,13 @@ public class OrderController {
         return null;
     }
 
-    @PostMapping("/orderList")
+    @PostMapping("/list")
     @ApiOperation("查询个人订单列表")
     public JsonResult orderList(OrderQueryDto OrderQueryDto) {
         return JsonResult.success(orderService.orderList(OrderQueryDto));
     }
 
-    @PostMapping("/orderPage")
+    @PostMapping("/page")
     @ApiOperation("订单分页")
     public JsonResult orderPage(OrderQueryDto OrderQueryDto) {
         return JsonResult.success(orderService.getOrderPage(OrderQueryDto));
