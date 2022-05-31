@@ -76,10 +76,10 @@ public class UserInfo implements Serializable {
     private String avatarUrl;
 
     @ApiModelProperty("是否允许找到我")
-    private boolean isFlagFindMe;
+    private int isFlagFindMe;
 
     @ApiModelProperty("是否允许查看我")
-    private boolean isFlagCheckMe;
+    private int isFlagCheckMe;
 
     @ApiModelProperty("用户状态 1-审核中 2-已审核")
     private Integer status;

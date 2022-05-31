@@ -14,6 +14,7 @@ import javax.annotation.Resource;
  * @author quinn
  * @since 2022-05-26
  */
+@Resource
 public interface AddressMapper extends BaseMapper<Address> {
 
 }

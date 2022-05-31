@@ -1,6 +1,7 @@
 package com.tencent.wxcloudrun.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tencent.wxcloudrun.common.aop.UserLoginToken;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.entity.UserMessage;
 import com.tencent.wxcloudrun.service.impl.UserMessageServiceImpl;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Controller;
  * @author quinn
  * @since 2022-05-26
  */
-@Controller
+@RestController
 @RequestMapping("/userMessage")
 @Api(tags = "用户消息")
 public class UserMessageController {
@@ -38,13 +39,14 @@ public class UserMessageController {
 
     @GetMapping
     @ApiOperation("消息列表")
-    public JsonResult list(@RequestHeader(value = "token", required = false) String token){
+    @UserLoginToken
+    public JsonResult list(){
         Integer userId = LocalCache.getInt("userId");
 //        Integer userId = JwtUtils.getAudience(token);
         return JsonResult.success(userMessageService.list(new QueryWrapper<UserMessage>().lambda().eq(UserMessage::getUserId,userId)));
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     @ApiOperation("消息详情")
     public JsonResult get(@PathVariable Integer id){
         return JsonResult.success(userMessageService.getById(id));

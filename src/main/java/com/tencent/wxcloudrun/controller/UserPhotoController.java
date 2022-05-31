@@ -1,6 +1,7 @@
 package com.tencent.wxcloudrun.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tencent.wxcloudrun.common.aop.UserLoginToken;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.entity.UserPhoto;
 import com.tencent.wxcloudrun.service.impl.UserPhotoServiceImpl;
@@ -22,7 +23,7 @@ import java.util.List;
  * @author quinn
  * @since 2022-05-26
  */
-@Controller
+@RestController
 @RequestMapping("/userPhoto")
 @Api(tags = "用户拾忆照片")
 public class UserPhotoController {
@@ -32,7 +33,8 @@ public class UserPhotoController {
 
     @PostMapping("/addBatch")
     @ApiOperation("添加拾忆照片")
-    public JsonResult add(@RequestBody List<UserPhoto> userPhotos, @RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult add(@RequestBody List<UserPhoto> userPhotos) {
 
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
@@ -45,7 +47,7 @@ public class UserPhotoController {
 
     @GetMapping("/uploadList")
     @ApiOperation("拾忆照片上传列表")
-    public JsonResult uploadList(@RequestHeader(value = "token", required = false) String token) {
+    public JsonResult uploadList() {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         return JsonResult.success(userPhotoService.list(new QueryWrapper<UserPhoto>().lambda().eq(UserPhoto::getStatus,1).eq(UserPhoto::getUserId,userId)));
@@ -53,7 +55,8 @@ public class UserPhotoController {
 
     @GetMapping("/reviewList")
     @ApiOperation("拾忆照片审核列表")
-    public JsonResult reviewList(@RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult reviewList() {
         Integer userId = LocalCache.getInt("userId");
 //        Integer userId = JwtUtils.getAudience(token);
         return JsonResult.success(userPhotoService.list(new QueryWrapper<UserPhoto>().lambda().eq(UserPhoto::getStatus,2).eq(UserPhoto::getUserId, userId)));

@@ -2,6 +2,7 @@ package com.tencent.wxcloudrun.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tencent.wxcloudrun.common.aop.UserLoginToken;
 import com.tencent.wxcloudrun.vo.UserInfoVo;
 import com.tencent.wxcloudrun.common.aop.PassToken;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
@@ -30,7 +31,7 @@ import static com.tencent.wxcloudrun.exception.CommonEnum.NO_REGISTER;
  * @author quinn
  * @since 2022-05-26
  */
-@Controller
+@RestController
 @RequestMapping("/userInfo")
 @Api(tags = "用户信息")
 public class UserInfoController {
@@ -69,8 +70,7 @@ public class UserInfoController {
 
     @GetMapping("/login")
     @ApiOperation("登陆")
-    @PassToken
-    public JsonResult login(@RequestParam("微信openId") String openId) {
+    public JsonResult login(@RequestParam("openId") String openId) {
 
         UserInfo userInfo = userInfoService.getOne(new QueryWrapper<UserInfo>().lambda().eq(UserInfo::getOpenId, openId));
 
@@ -81,8 +81,8 @@ public class UserInfoController {
     @ApiOperation("全部校友")
     public JsonResult allUser() {
         QueryWrapper<UserInfo> userInfoQueryWrapper = new QueryWrapper<>();
-        userInfoQueryWrapper.lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::isFlagFindMe,true).orderByDesc(UserInfo::getUpdateTime).last("limit 100");
-        return JsonResult.success(userInfoService.listObjs(userInfoQueryWrapper));
+        userInfoQueryWrapper.lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagCheckMe,1).orderByDesc(UserInfo::getUpdateTime).last("limit 100");
+        return JsonResult.success(userInfoService.list(userInfoQueryWrapper));
     }
 
 
@@ -92,14 +92,14 @@ public class UserInfoController {
         List<UserMajorRelation> userMajorRelations = userMajorRelationService.list(new QueryWrapper<UserMajorRelation>().lambda().eq(UserMajorRelation::getMajorCode, majorCode));
         List<Integer> userIds = userMajorRelations.stream().map(UserMajorRelation::getUserId).collect(Collectors.toList());
 
-        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::isFlagFindMe,true).in(UserInfo::getId, userIds).orderByDesc(UserInfo::getUpdateTime));
+        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::getIsFlagFindMe,1).in(UserInfo::getId, userIds).orderByDesc(UserInfo::getUpdateTime));
         return JsonResult.success(list);
     }
 
-    @GetMapping("/usersByMajor")
+    @GetMapping("/usersByRegion")
     @ApiOperation("查询校友通过区域")
     public JsonResult usersByRegion(@ApiParam("区域编码") String regionCode) {
-        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::isFlagFindMe,true).in(UserInfo::getRegionCode, regionCode).orderByDesc(UserInfo::getUpdateTime));
+        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::getIsFlagFindMe,1).in(UserInfo::getRegionCode, regionCode).orderByDesc(UserInfo::getUpdateTime));
 
         return JsonResult.success(list);
     }
@@ -108,7 +108,7 @@ public class UserInfoController {
     @ApiOperation("查询校友通过年份")
     public JsonResult usersByYear(@ApiParam("高考年份") String year) {
 
-        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::isFlagFindMe,true).eq(UserInfo::getCollegeEntranceTime, year).orderByDesc(UserInfo::getUpdateTime));
+        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::getIsFlagFindMe,1).eq(UserInfo::getCollegeEntranceTime, year).orderByDesc(UserInfo::getUpdateTime));
 
         return JsonResult.success(list);
     }
@@ -129,7 +129,7 @@ public class UserInfoController {
 
         BeanUtil.copyProperties(userInfo, userInfoVo);
 
-        if (userInfo.isFlagCheckMe()) {
+        if (userInfo.getIsFlagCheckMe() ==1) {
             Region region = regionService.getOne(new QueryWrapper<Region>().lambda().eq(Region::getCode, userInfo.getRegionCode()));
             List<UserMajorRelation> userMajorRelations = userMajorRelationService.list(new QueryWrapper<UserMajorRelation>().lambda().eq(UserMajorRelation::getUserId, userId));
             List<Major> majors = majorService.list(new QueryWrapper<Major>().lambda().in(Major::getMajorCode, userMajorRelations.stream().map(UserMajorRelation::getMajorCode).collect(Collectors.toList())));

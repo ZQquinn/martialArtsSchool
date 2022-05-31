@@ -2,6 +2,7 @@ package com.tencent.wxcloudrun.config;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencent.wxcloudrun.common.aop.PassToken;
+import com.tencent.wxcloudrun.common.aop.UserLoginToken;
 import com.tencent.wxcloudrun.entity.UserInfo;
 import com.tencent.wxcloudrun.exception.BizException;
 import com.tencent.wxcloudrun.exception.CommonEnum;
@@ -36,6 +37,7 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
         if ("swaggerResources".equals(method.getName())){
             return true;
         }
+
         //检查是否有passtoken注释，有则跳过认证
         if (method.isAnnotationPresent(PassToken.class)) {
             PassToken passToken = method.getAnnotation(PassToken.class);
@@ -43,8 +45,9 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-        //默认全部检查
-        else {
+
+        //检查有没有需要用户权限的注解
+        if (method.isAnnotationPresent(UserLoginToken.class) && method.getAnnotation(UserLoginToken.class).required()) {
             // 执行认证
             if (token == null) {
                 //这里其实是登录失效,没token了   这个错误也是我自定义的，读者需要自己修改

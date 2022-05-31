@@ -3,6 +3,7 @@ package com.tencent.wxcloudrun.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.tencent.wxcloudrun.common.aop.UserLoginToken;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.entity.Cart;
 import com.tencent.wxcloudrun.entity.ShopSku;
@@ -29,7 +30,7 @@ import java.util.Map;
  * @author quinn
  * @since 2022-05-26
  */
-@Controller
+@RestController
 @RequestMapping("/cart")
 @Api(tags = "购物车")
 public class CartController {
@@ -42,7 +43,8 @@ public class CartController {
 
     @PostMapping
     @ApiOperation("添加购物车")
-    public JsonResult add(@RequestHeader(value = "token", required = false) String token, @RequestBody Cart cart) {
+    @UserLoginToken
+    public JsonResult add( @RequestBody Cart cart) {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         cart.setUserId(userId);
@@ -51,7 +53,8 @@ public class CartController {
 
     @GetMapping
     @ApiOperation("购物车列表")
-    public JsonResult list(@RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult list() {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         List<Cart> carts = cartService.list(new LambdaQueryWrapper<Cart>().eq(Cart::getUserId, userId));
@@ -67,9 +70,10 @@ public class CartController {
         return JsonResult.success(resultArray);
     }
 
-    @PostMapping
+    @PostMapping("/delete")
     @ApiOperation("删除购物车商品")
-    public JsonResult delBatch(List<Integer> skuIds, @RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult delBatch(List<Integer> skuIds) {
         Integer userId = LocalCache.getInt("userId");
 //        Integer userId = JwtUtils.getAudience(token);
         return JsonResult.success(cartService.remove(new LambdaQueryWrapper<Cart>().in(Cart::getSkuId, skuIds).eq(Cart::getUserId, userId)));

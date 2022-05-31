@@ -2,6 +2,7 @@ package com.tencent.wxcloudrun.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tencent.wxcloudrun.common.aop.UserLoginToken;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.entity.Address;
 import com.tencent.wxcloudrun.exception.BizException;
@@ -13,7 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 
 /**
  * <p>
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Controller;
  * @author quinn
  * @since 2022-05-26
  */
-@Controller
+@RestController
 @RequestMapping("/address")
 @Api(tags = "用户地址管理")
 public class AddressController {
@@ -36,7 +36,8 @@ public class AddressController {
 
     @PostMapping("/add")
     @ApiOperation("添加地址")
-    public JsonResult add(@RequestBody Address address, @RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult add(@RequestBody Address address) {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         address.setUserId(userId);
@@ -51,7 +52,8 @@ public class AddressController {
 
     @GetMapping("/list")
     @ApiOperation("地址列表")
-    public JsonResult list(@RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult list() {
 //        Integer userId =JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         return JsonResult.success(addressService.list(new QueryWrapper<Address>().lambda().eq(Address::getUserId, userId).orderByDesc(Address::getDefaultAddress)));
@@ -59,7 +61,8 @@ public class AddressController {
 
     @PostMapping("/update")
     @ApiOperation("更新地址")
-    public JsonResult update(@RequestBody Address address, @RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult update(@RequestBody Address address) {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         address.setUserId(userId);
@@ -89,7 +92,8 @@ public class AddressController {
 
     @GetMapping("/default")
     @ApiOperation("查询默认地址")
-    public JsonResult queryDefault(@RequestHeader(value = "token", required = false) String token) {
+    @UserLoginToken
+    public JsonResult queryDefault() {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         return JsonResult.success(addressService.getOne(new LambdaQueryWrapper<Address>().eq(Address::getDefaultAddress, true).eq(Address::getUserId, userId)));

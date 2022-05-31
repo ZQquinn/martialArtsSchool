@@ -30,6 +30,7 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/*Mapper.xml
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-enums-package: com.tencent.wxcloudrun.enums
 
 

@@ -1,5 +1,6 @@
 package com.tencent.wxcloudrun.controller;
 
+import com.tencent.wxcloudrun.common.aop.UserLoginToken;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.entity.AlumniCard;
 import com.tencent.wxcloudrun.service.impl.AlumniCardServiceImpl;
@@ -8,10 +9,7 @@ import com.tencent.wxcloudrun.utils.LocalCache;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -22,7 +20,7 @@ import org.springframework.stereotype.Controller;
  * @author quinn
  * @since 2022-05-26
  */
-@Controller
+@RestController
 @RequestMapping("/alumniCard")
 @Api(tags = "校友卡")
 public class AlumniCardController {
@@ -32,7 +30,8 @@ public class AlumniCardController {
 
     @PostMapping("/save")
     @ApiModelProperty("注册或更新")
-    public JsonResult save(@RequestBody AlumniCard alumniCard,@RequestHeader(value = "token",required = false) String token){
+    @UserLoginToken
+    public JsonResult save(@RequestBody AlumniCard alumniCard){
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         alumniCard.setUserId(userId);
@@ -41,7 +40,8 @@ public class AlumniCardController {
     }
 
     @PostMapping("/query")
-    public JsonResult query(@RequestHeader(value = "token",required = false) String token){
+    @UserLoginToken
+    public JsonResult query(){
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
 

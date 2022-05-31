@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,7 +27,7 @@ import java.util.Date;
  * @author quinn
  * @since 2022-05-26
  */
-@Controller
+@RestController
 @RequestMapping("/order")
 @Api(tags = "订单")
 public class OrderController {
@@ -51,13 +52,13 @@ public class OrderController {
         return null;
     }
 
-    @PostMapping
+    @PostMapping("/orderList")
     @ApiOperation("查询个人订单列表")
     public JsonResult orderList(OrderQueryDto OrderQueryDto) {
         return JsonResult.success(orderService.orderList(OrderQueryDto));
     }
 
-    @PostMapping
+    @PostMapping("/orderPage")
     @ApiOperation("订单分页")
     public JsonResult orderPage(OrderQueryDto OrderQueryDto) {
         return JsonResult.success(orderService.getOrderPage(OrderQueryDto));
