@@ -3,15 +3,14 @@ package com.tencent.wxcloudrun.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencent.wxcloudrun.common.aop.UserLoginToken;
+import com.tencent.wxcloudrun.utils.LocalCache;
 import com.tencent.wxcloudrun.vo.UserInfoVo;
 import com.tencent.wxcloudrun.common.aop.PassToken;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.entity.*;
 import com.tencent.wxcloudrun.service.impl.*;
 import com.tencent.wxcloudrun.utils.JwtUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -70,15 +69,20 @@ public class UserInfoController {
 
     @GetMapping("/login")
     @ApiOperation("登陆")
-    public JsonResult login(@RequestParam("openId") String openId) {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "openId",value = "openId",dataTypeClass = String.class),
+            @ApiImplicitParam(name = "phone",value = "手机号",dataTypeClass = String.class)
+    })
+    public JsonResult login( String openId,String phone) {
 
-        UserInfo userInfo = userInfoService.getOne(new QueryWrapper<UserInfo>().lambda().eq(UserInfo::getOpenId, openId));
+        UserInfo userInfo = userInfoService.getOne(new QueryWrapper<UserInfo>().lambda().eq(UserInfo::getOpenId, openId).eq(UserInfo::getPhone,phone));
 
         return userInfo != null ? JsonResult.success(JwtUtils.createToken(userInfo.getId().toString(), openId)) : JsonResult.error(NO_REGISTER);
     }
 
     @GetMapping("/allUser")
     @ApiOperation("全部校友")
+    @UserLoginToken
     public JsonResult allUser() {
         QueryWrapper<UserInfo> userInfoQueryWrapper = new QueryWrapper<>();
         userInfoQueryWrapper.lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagCheckMe,1).orderByDesc(UserInfo::getUpdateTime).last("limit 100");
@@ -88,7 +92,9 @@ public class UserInfoController {
 
     @GetMapping("/usersByMajor")
     @ApiOperation("查询校友通过专业")
-    public JsonResult usersByMajor(@ApiParam("专业码") String majorCode) {
+    @ApiImplicitParam(name = "majorCode",value = "专业编码",dataTypeClass = String.class)
+    @UserLoginToken
+    public JsonResult usersByMajor(String majorCode) {
         List<UserMajorRelation> userMajorRelations = userMajorRelationService.list(new QueryWrapper<UserMajorRelation>().lambda().eq(UserMajorRelation::getMajorCode, majorCode));
         List<Integer> userIds = userMajorRelations.stream().map(UserMajorRelation::getUserId).collect(Collectors.toList());
 
@@ -98,7 +104,9 @@ public class UserInfoController {
 
     @GetMapping("/usersByRegion")
     @ApiOperation("查询校友通过区域")
-    public JsonResult usersByRegion(@ApiParam("区域编码") String regionCode) {
+    @UserLoginToken
+    @ApiImplicitParam(name = "regionCode",value = "区域编码",dataTypeClass = String.class)
+    public JsonResult usersByRegion(String regionCode) {
         List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::getIsFlagFindMe,1).in(UserInfo::getRegionCode, regionCode).orderByDesc(UserInfo::getUpdateTime));
 
         return JsonResult.success(list);
@@ -106,7 +114,9 @@ public class UserInfoController {
 
     @GetMapping("/usersByYear")
     @ApiOperation("查询校友通过年份")
-    public JsonResult usersByYear(@ApiParam("高考年份") String year) {
+    @UserLoginToken
+    @ApiImplicitParam(name = "year",value = "高考年份",dataTypeClass = String.class)
+    public JsonResult usersByYear(String year) {
 
         List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::getIsFlagFindMe,1).eq(UserInfo::getCollegeEntranceTime, year).orderByDesc(UserInfo::getUpdateTime));
 
@@ -122,14 +132,16 @@ public class UserInfoController {
 
     @GetMapping("/getAlumnusInfo")
     @ApiOperation("观看校友信息")
-    public JsonResult getAlumnusInfo(@ApiParam("校友id") Integer userId) {
+    @ApiImplicitParam(name = "userId",value = "校友id",dataTypeClass = Integer.class)
+    @UserLoginToken
+    public JsonResult getAlumnusInfo(Integer userId) {
 
         UserInfoVo userInfoVo = new UserInfoVo();
         UserInfo userInfo = userInfoService.getById(userId);
 
         BeanUtil.copyProperties(userInfo, userInfoVo);
 
-        if (userInfo.getIsFlagCheckMe() ==1) {
+        if (userInfo.getIsFlagCheckMe() == 1) {
             Region region = regionService.getOne(new QueryWrapper<Region>().lambda().eq(Region::getCode, userInfo.getRegionCode()));
             List<UserMajorRelation> userMajorRelations = userMajorRelationService.list(new QueryWrapper<UserMajorRelation>().lambda().eq(UserMajorRelation::getUserId, userId));
             List<Major> majors = majorService.list(new QueryWrapper<Major>().lambda().in(Major::getMajorCode, userMajorRelations.stream().map(UserMajorRelation::getMajorCode).collect(Collectors.toList())));
@@ -151,8 +163,8 @@ public class UserInfoController {
 
     @GetMapping("/getUserInfo")
     @ApiOperation("查询个人信息")
-    public JsonResult getUserInfo(@ApiParam("用户id") Integer userId){
-
+    public JsonResult getUserInfo(){
+        Integer userId = LocalCache.getInt("userId");
         UserInfoVo userInfoVo = new UserInfoVo();
         UserInfo userInfo = userInfoService.getById(userId);
         BeanUtil.copyProperties(userInfo,userInfoVo);
@@ -163,9 +175,5 @@ public class UserInfoController {
         userInfoVo.setMajors(majors);
         return JsonResult.success(userInfoVo);
     }
-
-
-//    public JsonResult
-
 
 }

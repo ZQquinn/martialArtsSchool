@@ -8,7 +8,6 @@ import com.tencent.wxcloudrun.entity.Address;
 import com.tencent.wxcloudrun.exception.BizException;
 import com.tencent.wxcloudrun.mapper.AddressMapper;
 import com.tencent.wxcloudrun.service.impl.AddressServiceImpl;
-import com.tencent.wxcloudrun.utils.JwtUtils;
 import com.tencent.wxcloudrun.utils.LocalCache;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +40,7 @@ public class AddressController {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         address.setUserId(userId);
-        if (address.getDefaultAddress()) {
+        if (address.getDefaultAddress() == 1 ) {
             boolean exists = addressMapper.exists(new QueryWrapper<Address>().lambda().eq(Address::getUserId, userId).eq(Address::getDefaultAddress, true));
             if (exists) {
                 throw new BizException("已经存在默认地址");
@@ -66,8 +65,8 @@ public class AddressController {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         address.setUserId(userId);
-        if (address.getDefaultAddress()) {
-            boolean exists = addressMapper.exists(new QueryWrapper<Address>().lambda().eq(Address::getUserId, userId).eq(Address::getDefaultAddress, true));
+        if (address.getDefaultAddress() == 1) {
+            boolean exists = addressMapper.exists(new QueryWrapper<Address>().lambda().eq(Address::getUserId, userId).eq(Address::getDefaultAddress, 1));
             if (exists) {
                 throw new BizException("已经存在默认地址");
             }
@@ -96,7 +95,7 @@ public class AddressController {
     public JsonResult queryDefault() {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
-        return JsonResult.success(addressService.getOne(new LambdaQueryWrapper<Address>().eq(Address::getDefaultAddress, true).eq(Address::getUserId, userId)));
+        return JsonResult.success(addressService.getOne(new LambdaQueryWrapper<Address>().eq(Address::getDefaultAddress, 1).eq(Address::getUserId, userId)));
     }
 
 

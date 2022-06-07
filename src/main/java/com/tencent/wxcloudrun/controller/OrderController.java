@@ -6,17 +6,17 @@ import com.tencent.wxcloudrun.dto.OrderRequestDto;
 import com.tencent.wxcloudrun.service.impl.OrderServiceImpl;
 import com.tencent.wxcloudrun.service.impl.WxPayServiceImpl;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -64,6 +64,12 @@ public class OrderController {
         return JsonResult.success(orderService.getOrderPage(OrderQueryDto));
     }
 
+    @PostMapping("/orderDetail")
+    @ApiOperation("订单详情")
+    public JsonResult orderDetail(String outTradeNo){
+        return JsonResult.success(orderService.getOrderDetail(outTradeNo));
+    }
+
     @RequestMapping(value = "/payNotify", method = {org.springframework.web.bind.annotation.RequestMethod.POST, org.springframework.web.bind.annotation.RequestMethod.GET})
     @ResponseBody
     public void payNotify(HttpServletRequest request, HttpServletResponse response) {
@@ -72,6 +78,16 @@ public class OrderController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping("/countFreight")
+    @ApiOperation("运费计算")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code",value = "区域编码"),
+            @ApiImplicitParam(name = "actualPrice",value = "商品总价")
+    })
+    public JsonResult countFreight(String code,String actualPrice){
+        return  JsonResult.success(orderService.countFreight(code,new BigDecimal(actualPrice)));
     }
 
 }

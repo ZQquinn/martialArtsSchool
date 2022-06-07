@@ -6,6 +6,7 @@ import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.entity.Region;
 import com.tencent.wxcloudrun.service.impl.RegionServiceImpl;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class RegionController {
     private RegionServiceImpl regionService;
 
     @GetMapping("/list")
+    @ApiOperation("注册时用到区域")
     private JsonResult list(@ApiParam("1-国内 2-海外") int type,
                             @RequestParam(required = false) @ApiParam("父级区域") String regionParent){
         LambdaQueryWrapper<Region> wrapper = new QueryWrapper<Region>().lambda().eq(Region::getType, type);

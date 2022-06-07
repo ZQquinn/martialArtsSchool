@@ -34,8 +34,8 @@ public class Address implements Serializable {
     @ApiModelProperty("详细地址")
     private String address;
 
-    @ApiModelProperty("是否是默认地址")
-    private boolean defaultAddress;
+    @ApiModelProperty("是否是默认地址 1 -是 0-不是")
+    private int defaultAddress;
 
     @ApiModelProperty("所属用户ID")
     private Integer userId;
@@ -86,11 +86,11 @@ public class Address implements Serializable {
         this.address = address;
     }
 
-    public boolean getDefaultAddress() {
+    public int getDefaultAddress() {
         return defaultAddress;
     }
 
-    public void setDefaultAddress(boolean defaultAddress) {
+    public void setDefaultAddress(int defaultAddress) {
         this.defaultAddress = defaultAddress;
     }
 

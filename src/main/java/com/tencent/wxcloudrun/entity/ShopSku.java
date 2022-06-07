@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.tencent.wxcloudrun.enums.SkuStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -53,8 +54,8 @@ public class ShopSku implements Serializable {
     @ApiModelProperty("计量单位")
     private String unit;
 
-    @ApiModelProperty("状态")
-    private Integer status;
+    @ApiModelProperty("状态 1-上架 2-下架 0-删除")
+    private SkuStatus status;
 
     @ApiModelProperty("每个规格的具体值 格式: 尺码_S,颜色_经典款短袖黑色A")
     private String specification;
@@ -68,6 +69,10 @@ public class ShopSku implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty("副图")
     private List<SkuImg> skuImgs;
+
+    @TableField(exist = false)
+    @ApiModelProperty("sku属性")
+    private List<SkuAttributes> skuAttributes;
 
 
 

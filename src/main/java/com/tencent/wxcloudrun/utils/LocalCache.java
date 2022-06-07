@@ -10,12 +10,12 @@ public class LocalCache {
     private static final Long DEFAULT_TIMEOUT = 1 * 60 * 1000L;
     //默认清理间隔时间 单位s
     private static final Long CLEAN_TIMEOUT = 1 * 60 * 1000L;
-    //缓存对象
-    public static TimedCache<String, String> timedCache = CacheUtil.newTimedCache(DEFAULT_TIMEOUT*60*60*2);
+    //缓存对象 //5分钟
+    public static TimedCache<String, String> timedCache = CacheUtil.newTimedCache(DEFAULT_TIMEOUT*60*5);
 
     static {
-        //启动定时任务
-        timedCache.schedulePrune(CLEAN_TIMEOUT*60*60*6);
+        //启动定时任务  //10分钟
+        timedCache.schedulePrune(CLEAN_TIMEOUT*60*10);
     }
 
     public static void put(String key, String value) {

@@ -134,6 +134,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return wxPayService.queryOrder(outTradeNo);
     }
 
+    public BigDecimal  countFreight(String code, BigDecimal actualPrice){
+        ArrayList<String> codes = new ArrayList<>();
+
+
+        if(actualPrice.compareTo(new BigDecimal("99")) == 1){
+            return new BigDecimal("0.00");
+        }
+
+        if(codes.contains(code)){
+            return new BigDecimal("8.00");
+        }
+
+        return new BigDecimal("15.00");
+
+    }
+
 
     public void prepay() {
 

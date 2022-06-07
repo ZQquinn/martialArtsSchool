@@ -50,8 +50,8 @@ public class AlumniCard implements Serializable {
     @ApiModelProperty("用户id")
     private Integer userId;
 
-
-
+    @ApiModelProperty("状态 1-待审核 2-已审核")
+    private Integer status;
 
     @Override
     public String toString() {
