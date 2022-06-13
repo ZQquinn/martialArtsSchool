@@ -4,10 +4,7 @@ package com.tencent.wxcloudrun.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
-import com.tencent.wxcloudrun.dto.AlumniCardDto;
-import com.tencent.wxcloudrun.dto.PhotoDto;
-import com.tencent.wxcloudrun.dto.ShopSkuDto;
-import com.tencent.wxcloudrun.dto.UserInfoDto;
+import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.*;
 import com.tencent.wxcloudrun.service.impl.*;
 import io.swagger.annotations.Api;
@@ -17,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +46,14 @@ public class AdminController {
 
     @Autowired
     private UserPhotoServiceImpl userPhotoService;
+
+    @Autowired
+    private OrderSkuServiceImpl orderSkuService;
+
+    @Autowired
+    private OrderServiceImpl orderService;
+
+
 
     @PostMapping("/user/page")
     @ApiOperation("校友分页列表")
@@ -225,7 +231,31 @@ public class AdminController {
     }
 
 
-//    public JsonResult
+    @PostMapping("/order/list")
+    @ApiOperation("订单列表")
+    public JsonResult orderList(@RequestBody OrderQueryDto orderQueryDto){
+
+        QueryWrapper<OrderSku> orderSkuQueryWrapper = new QueryWrapper<>();
+
+        QueryWrapper<Order> orderQueryWrapper = new QueryWrapper<>();
+        List<OrderSku> orderSkus = new ArrayList<>();
+
+        if (StringUtils.isNotBlank(orderQueryDto.getParam())){
+            orderSkuQueryWrapper.lambda().like(OrderSku::getSkuTitle,orderQueryDto.getParam()).or().eq(OrderSku::getOrderNo,orderQueryDto.getParam());
+            orderSkus = orderSkuService.list(orderSkuQueryWrapper);
+        }
+
+        if(StringUtils.isNotBlank(orderQueryDto.getStartTime())){
+            orderQueryWrapper.lambda().between(Order::getOrderTime,orderQueryDto.getStartTime(),orderQueryDto.getEndTime());
+        }
+
+        if(orderSkus.isEmpty()){
+            orderQueryWrapper.lambda().in(Order::getId,orderSkus.stream().map(OrderSku::getOrderId).collect(Collectors.toList()));
+        }
+
+
+        return JsonResult.success();
+    }
 
 
 

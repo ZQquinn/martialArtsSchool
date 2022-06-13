@@ -2,10 +2,12 @@ package com.tencent.wxcloudrun.entity;
 
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.tencent.wxcloudrun.enums.OrderStatus;
 import io.swagger.annotations.ApiModel;
@@ -93,6 +95,8 @@ public class Order implements Serializable {
 
     private LocalDateTime updateTime;
 
+    @TableField(exist = false)
+    private List<OrderSku> orderSkuList;
 
 
 

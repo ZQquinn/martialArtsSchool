@@ -1,12 +1,16 @@
 package com.tencent.wxcloudrun.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -18,6 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("order_sku")
 @ApiModel(value = "OrderSku对象", description = "订单商品")
+@Data
 public class OrderSku implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,86 +57,13 @@ public class OrderSku implements Serializable {
     @ApiModelProperty("商品重量")
     private Double weight;
 
+    @TableField(exist = false)
+    @ApiModelProperty("副图")
+    private List<SkuImg> skuImgs;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getSkuId() {
-        return skuId;
-    }
-
-    public void setSkuId(Integer skuId) {
-        this.skuId = skuId;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getOrderNo() {
-        return orderNo;
-    }
-
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo;
-    }
-
-    public String getSkuTitle() {
-        return skuTitle;
-    }
-
-    public void setSkuTitle(String skuTitle) {
-        this.skuTitle = skuTitle;
-    }
-
-    public Integer getNum() {
-        return num;
-    }
-
-    public void setNum(Integer num) {
-        this.num = num;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public Double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Double weight) {
-        this.weight = weight;
-    }
+    @TableField(exist = false)
+    @ApiModelProperty("sku属性")
+    private List<SkuAttributes> skuAttributes;
 
     @Override
     public String toString() {
