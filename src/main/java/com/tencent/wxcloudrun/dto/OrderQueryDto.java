@@ -17,6 +17,9 @@ public class OrderQueryDto extends PageQuery<Order> {
     @ApiModelProperty("查询参数 商品名称或者订单编号")
     private String param;
 
+    @ApiModelProperty("订单状态")
+    private Integer status;
+
     @ApiModelProperty("开始时间")
     private String startTime;
 

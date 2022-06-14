@@ -18,6 +18,6 @@ import java.util.List;
 public interface OrderMapper extends BaseMapper<Order> {
 
 
-//    List<Order> selectOrderPages(@Param("orderQueryDto")OrderQueryDto orderQueryDto);
+    List<Order> selectOrderPages(@Param("orderQueryDto")OrderQueryDto orderQueryDto);
 
 }

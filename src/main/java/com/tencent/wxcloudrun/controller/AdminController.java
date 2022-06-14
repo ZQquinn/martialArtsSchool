@@ -1,8 +1,10 @@
 package com.tencent.wxcloudrun.controller;
 
 
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.*;
@@ -52,7 +54,6 @@ public class AdminController {
 
     @Autowired
     private OrderServiceImpl orderService;
-
 
 
     @PostMapping("/user/page")
@@ -168,8 +169,8 @@ public class AdminController {
     @ApiOperation("商品详情")
     public JsonResult skuDetail(@PathVariable int skuId) {
         ShopSku shopSku = shopSkuService.getById(skuId);
-        shopSku.setSkuImgs(skuImgService.list(new QueryWrapper<SkuImg>().lambda().eq(SkuImg::getSkuId,skuId)));
-        shopSku.setSkuAttributes(skuAttributesService.list(new QueryWrapper<SkuAttributes>().lambda().eq(SkuAttributes::getSkuId,skuId)));
+        shopSku.setSkuImgs(skuImgService.list(new QueryWrapper<SkuImg>().lambda().eq(SkuImg::getSkuId, skuId)));
+        shopSku.setSkuAttributes(skuAttributesService.list(new QueryWrapper<SkuAttributes>().lambda().eq(SkuAttributes::getSkuId, skuId)));
         return JsonResult.success(shopSku);
     }
 
@@ -205,60 +206,89 @@ public class AdminController {
 
     @PostMapping("/album/add")
     @ApiOperation("创建相册")
-    public JsonResult albumAdd(@RequestBody Album album){
+    public JsonResult albumAdd(@RequestBody Album album) {
 
         return JsonResult.success(albumService.save(album));
     }
 
     @GetMapping("/album/list")
     @ApiOperation("相册列表")
-    public JsonResult albumList( ){
+    public JsonResult albumList() {
         return JsonResult.success(albumService.list());
     }
 
 
     @PostMapping("/album/uploadPhoto")
     @ApiOperation("上传照片进相册")
-    public JsonResult uploadPhotoInAlbum(@RequestBody List<UserPhoto> photos){
+    public JsonResult uploadPhotoInAlbum(@RequestBody List<UserPhoto> photos) {
         return JsonResult.success(userPhotoService.saveBatch(photos));
     }
 
 
     @PostMapping("/album/deletePhoto")
     @ApiOperation("删除照片")
-    public JsonResult deletePhoto(@RequestBody List<Integer> ids){
+    public JsonResult deletePhoto(@RequestBody List<Integer> ids) {
         return JsonResult.success(userPhotoService.removeBatchByIds(ids));
     }
 
 
     @PostMapping("/order/list")
     @ApiOperation("订单列表")
-    public JsonResult orderList(@RequestBody OrderQueryDto orderQueryDto){
+    public JsonResult orderList(@RequestBody OrderQueryDto orderQueryDto) {
 
         QueryWrapper<OrderSku> orderSkuQueryWrapper = new QueryWrapper<>();
 
         QueryWrapper<Order> orderQueryWrapper = new QueryWrapper<>();
         List<OrderSku> orderSkus = new ArrayList<>();
 
-        if (StringUtils.isNotBlank(orderQueryDto.getParam())){
-            orderSkuQueryWrapper.lambda().like(OrderSku::getSkuTitle,orderQueryDto.getParam()).or().eq(OrderSku::getOrderNo,orderQueryDto.getParam());
+        if (StringUtils.isNotBlank(orderQueryDto.getParam())) {
+            orderSkuQueryWrapper.lambda().like(OrderSku::getSkuTitle, orderQueryDto.getParam()).or().eq(OrderSku::getOrderNo, orderQueryDto.getParam());
             orderSkus = orderSkuService.list(orderSkuQueryWrapper);
         }
 
-        if(StringUtils.isNotBlank(orderQueryDto.getStartTime())){
-            orderQueryWrapper.lambda().between(Order::getOrderTime,orderQueryDto.getStartTime(),orderQueryDto.getEndTime());
+
+
+        if (StringUtils.isNotBlank(orderQueryDto.getStartTime())) {
+            orderQueryWrapper.lambda().between(Order::getOrderTime, orderQueryDto.getStartTime(), orderQueryDto.getEndTime());
         }
 
-        if(orderSkus.isEmpty()){
-            orderQueryWrapper.lambda().in(Order::getId,orderSkus.stream().map(OrderSku::getOrderId).collect(Collectors.toList()));
+        if (orderSkus.isEmpty()) {
+            orderQueryWrapper.lambda().in(Order::getId, orderSkus.stream().map(OrderSku::getOrderId).collect(Collectors.toList()));
         }
 
+        if(null != orderQueryDto.getStatus()){
+            orderQueryWrapper.lambda().eq(Order::getStatus,orderQueryDto.getStatus());
+        }
 
-        return JsonResult.success();
+        Page<Order> orders = orderService.page(orderQueryDto.getPagePlus(), orderQueryWrapper);
+
+        orders.getRecords().forEach(order -> {
+            List<OrderSku> orderSkuList = orderSkuService.list(new QueryWrapper<OrderSku>().lambda().eq(OrderSku::getOrderId, order.getId()));
+
+            orderSkuList.forEach(orderSku -> {
+                orderSku.setSkuAttributes(skuAttributesService.list(new QueryWrapper<SkuAttributes>().lambda().eq(SkuAttributes::getSkuId, orderSku.getSkuId())));
+            });
+            order.setOrderSkuList(orderSkuList);
+        });
+
+        return JsonResult.success(orders);
     }
 
+    @GetMapping("/order/detail")
+    @ApiOperation("订单详情")
+    public JsonResult orderDetail(Integer id){
 
+        Order order = orderService.getById(id);
 
+        List<OrderSku> orderSkus = orderSkuService.list(new QueryWrapper<OrderSku>().lambda().eq(OrderSku::getOrderId, order.getId()));
+
+        orderSkus.forEach(orderSku -> {
+            orderSku.setSkuAttributes(skuAttributesService.list(new QueryWrapper<SkuAttributes>().lambda().eq(SkuAttributes::getSkuId,orderSku.getSkuId())));
+            orderSku.setSkuImgs(skuImgService.list(new QueryWrapper<SkuImg>().lambda().eq(SkuImg::getSkuId,orderSku.getSkuId())));
+        });
+
+        return JsonResult.success(orderSkus);
+    }
 
 
 }

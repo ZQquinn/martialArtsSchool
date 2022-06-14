@@ -1,8 +1,11 @@
 package com.tencent.wxcloudrun.controller;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencent.wxcloudrun.common.aop.UserLoginToken;
+import com.tencent.wxcloudrun.config.WxMaConfiguration;
 import com.tencent.wxcloudrun.utils.LocalCache;
 import com.tencent.wxcloudrun.vo.UserInfoVo;
 import com.tencent.wxcloudrun.common.aop.PassToken;
@@ -11,7 +14,9 @@ import com.tencent.wxcloudrun.entity.*;
 import com.tencent.wxcloudrun.service.impl.*;
 import com.tencent.wxcloudrun.utils.JwtUtils;
 import io.swagger.annotations.*;
+import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
@@ -47,6 +52,9 @@ public class UserInfoController {
     @Autowired
     private MajorServiceImpl majorService;
 
+    @Value("${wxpay.appId}")
+    private String appId;
+
 
     @PostMapping("/registerUser")
     @ApiOperation("注册用户")
@@ -67,13 +75,33 @@ public class UserInfoController {
         return JsonResult.success();
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     @ApiOperation("登陆")
+    public JsonResult login(String code){
+
+        final WxMaService wxService = WxMaConfiguration.getMaService(appId);
+
+        WxMaJscode2SessionResult session = null;
+        try {
+            session = wxService.getUserService().getSessionInfo(code);
+            //TODO 可以增加自己的逻辑，关联业务相关数据
+            return JsonResult.success(session);
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+        }
+
+        return JsonResult.error(null);
+    }
+
+
+
+    @GetMapping("/userInfo")
+    @ApiOperation("获取用户信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "openId",value = "openId",dataTypeClass = String.class),
             @ApiImplicitParam(name = "phone",value = "手机号",dataTypeClass = String.class)
     })
-    public JsonResult login( String openId,String phone) {
+    public JsonResult userInfo( String openId,String phone) {
 
         UserInfo userInfo = userInfoService.getOne(new QueryWrapper<UserInfo>().lambda().eq(UserInfo::getOpenId, openId).eq(UserInfo::getPhone,phone));
 

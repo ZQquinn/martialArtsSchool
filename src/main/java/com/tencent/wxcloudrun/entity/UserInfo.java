@@ -44,7 +44,6 @@ public class UserInfo implements Serializable {
     private String schoolAt;
 
 
-
     @ApiModelProperty("高考年份")
     private String collegeEntranceTime;
 
