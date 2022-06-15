@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
+
 /**
  * <p>
  * 用户消息 前端控制器
@@ -40,7 +42,7 @@ public class UserMessageController {
     @GetMapping
     @ApiOperation("消息列表")
     @UserLoginToken
-    public JsonResult list(){
+    public JsonResult<List<UserMessage>> list(){
         Integer userId = LocalCache.getInt("userId");
 //        Integer userId = JwtUtils.getAudience(token);
         return JsonResult.success(userMessageService.list(new QueryWrapper<UserMessage>().lambda().eq(UserMessage::getUserId,userId)));
@@ -48,7 +50,7 @@ public class UserMessageController {
 
     @GetMapping("/{id}")
     @ApiOperation("消息详情")
-    public JsonResult get(@PathVariable Integer id){
+    public JsonResult<UserMessage> get(@PathVariable Integer id){
         return JsonResult.success(userMessageService.getById(id));
     }
 

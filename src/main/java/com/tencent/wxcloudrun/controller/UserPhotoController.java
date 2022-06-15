@@ -47,7 +47,7 @@ public class UserPhotoController {
 
     @GetMapping("/uploadList")
     @ApiOperation("拾忆照片上传列表")
-    public JsonResult uploadList() {
+    public JsonResult<List<UserPhoto>> uploadList() {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         return JsonResult.success(userPhotoService.list(new QueryWrapper<UserPhoto>().lambda().eq(UserPhoto::getStatus,1).eq(UserPhoto::getUserId,userId)));
@@ -56,7 +56,7 @@ public class UserPhotoController {
     @GetMapping("/reviewList")
     @ApiOperation("拾忆照片审核列表")
     @UserLoginToken
-    public JsonResult reviewList() {
+    public JsonResult<List<UserPhoto>> reviewList() {
         Integer userId = LocalCache.getInt("userId");
 //        Integer userId = JwtUtils.getAudience(token);
         return JsonResult.success(userPhotoService.list(new QueryWrapper<UserPhoto>().lambda().eq(UserPhoto::getStatus,2).eq(UserPhoto::getUserId, userId)));

@@ -21,6 +21,7 @@ import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.component.WxPayV3Bean;
 import com.tencent.wxcloudrun.exception.BizException;
 import com.tencent.wxcloudrun.service.impl.WxPayServiceImpl;
+import io.swagger.annotations.Api;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/vxPay")
+@RequestMapping("/wxPay")
+@Api(tags = "微信支付")
 public class WxPayV3Controller {
 
     @Resource

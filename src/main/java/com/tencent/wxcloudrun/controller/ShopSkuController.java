@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
+
 /**
  * <p>
  * 商城商品sku 前端控制器
@@ -36,7 +38,7 @@ public class ShopSkuController {
 
     @GetMapping
     @ApiOperation("商品列表")
-    public JsonResult list(@RequestParam(required = false) @ApiParam("商品名称") String skuName){
+    public JsonResult<List<ShopSku>> list(@RequestParam(required = false) @ApiParam("商品名称") String skuName){
         LambdaQueryWrapper<ShopSku> shopSkuQueryWrapper = new LambdaQueryWrapper();
         if(StringUtils.isNotBlank(skuName)){
             shopSkuQueryWrapper.like(ShopSku::getTitle,skuName).or().like(ShopSku::getDescription,skuName);
@@ -46,7 +48,7 @@ public class ShopSkuController {
 
     @GetMapping("/{id}")
     @ApiOperation("商品详情")
-    public JsonResult get(@PathVariable Integer id){
+    public JsonResult<ShopSku> get(@PathVariable Integer id){
         ShopSku shopSku = shopSkuService.getById(id);
         shopSku.setSkuImgs(skuImgService.list(new LambdaQueryWrapper<SkuImg>().eq(SkuImg::getSkuId,shopSku.getSkuId())));
         return JsonResult.success(shopSku);

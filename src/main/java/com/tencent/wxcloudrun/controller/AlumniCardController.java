@@ -41,7 +41,7 @@ public class AlumniCardController {
 
     @PostMapping("/query")
     @UserLoginToken
-    public JsonResult query(){
+    public JsonResult<AlumniCard> query(){
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
 

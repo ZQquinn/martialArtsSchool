@@ -1,6 +1,8 @@
 server:
   port: 8080
 
+knife4j:
+  enable: true
 
 spring:
   datasource:
@@ -50,7 +52,7 @@ wx:
   miniapp:
     configs:
       - appid: wx40aef2a640a5077a
-        secret: a1d975738a46cef50bdcb02ede86208a#
+        secret: a1d975738a46cef50bdcb02ede86208a
         token: #微信小程序消息服务器配置的token
         aesKey: #微信小程序消息服务器配置的EncodingAESKey
         msgDataFormat: JSON

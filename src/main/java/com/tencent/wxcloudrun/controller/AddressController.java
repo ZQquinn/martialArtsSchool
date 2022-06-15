@@ -14,6 +14,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * <p>
  * 地址 前端控制器
@@ -52,7 +54,7 @@ public class AddressController {
     @GetMapping("/list")
     @ApiOperation("地址列表")
     @UserLoginToken
-    public JsonResult list() {
+    public JsonResult<List<Address>> list() {
 //        Integer userId =JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         return JsonResult.success(addressService.list(new QueryWrapper<Address>().lambda().eq(Address::getUserId, userId).orderByDesc(Address::getDefaultAddress)));
@@ -84,7 +86,7 @@ public class AddressController {
 
     @GetMapping("/detail")
     @ApiOperation("地址详情")
-    public JsonResult query(Integer id) {
+    public JsonResult<Address> query(Integer id) {
         return JsonResult.success(addressService.getById(id));
     }
 
@@ -92,7 +94,7 @@ public class AddressController {
     @GetMapping("/default")
     @ApiOperation("查询默认地址")
     @UserLoginToken
-    public JsonResult queryDefault() {
+    public JsonResult<Address> queryDefault() {
 //        Integer userId = JwtUtils.getAudience(token);
         Integer userId = LocalCache.getInt("userId");
         return JsonResult.success(addressService.getOne(new LambdaQueryWrapper<Address>().eq(Address::getDefaultAddress, 1).eq(Address::getUserId, userId)));

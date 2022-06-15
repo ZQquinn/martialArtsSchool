@@ -1,8 +1,10 @@
 package com.tencent.wxcloudrun.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.dto.OrderQueryDto;
 import com.tencent.wxcloudrun.dto.OrderRequestDto;
+import com.tencent.wxcloudrun.entity.Order;
 import com.tencent.wxcloudrun.service.impl.OrderServiceImpl;
 import com.tencent.wxcloudrun.service.impl.WxPayServiceImpl;
 import io.swagger.annotations.Api;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -54,13 +57,13 @@ public class OrderController {
 
     @PostMapping("/list")
     @ApiOperation("查询个人订单列表")
-    public JsonResult orderList(OrderQueryDto OrderQueryDto) {
+    public JsonResult<List<Order>> orderList(OrderQueryDto OrderQueryDto) {
         return JsonResult.success(orderService.orderList(OrderQueryDto));
     }
 
     @PostMapping("/page")
     @ApiOperation("订单分页")
-    public JsonResult orderPage(OrderQueryDto OrderQueryDto) {
+    public JsonResult<IPage<Order>> orderPage(OrderQueryDto OrderQueryDto) {
         return JsonResult.success(orderService.getOrderPage(OrderQueryDto));
     }
 

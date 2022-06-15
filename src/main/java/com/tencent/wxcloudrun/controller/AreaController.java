@@ -38,7 +38,7 @@ public class AreaController {
     @GetMapping("/list")
     @ApiOperation("收货地址查询列表")
     @ApiImplicitParam(name = "code", value = "地区编码", required = false)
-    public JsonResult list(@RequestParam(required = false) String code) {
+    public JsonResult<List<Area>> list(@RequestParam(required = false) String code) {
 
         QueryWrapper<Area> areaQueryWrapper = null;
         if (StringUtils.isNotBlank(code)) {

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * <p>
  * 省市、国家 前端控制器
@@ -34,9 +36,9 @@ public class RegionController {
 
     @GetMapping("/list")
     @ApiOperation("注册时用到区域")
-    private JsonResult list(@ApiParam("1-国内 2-海外") int type,
-                            @RequestParam(required = false) @ApiParam("父级区域") String regionParent){
-        LambdaQueryWrapper<Region> wrapper = new QueryWrapper<Region>().lambda().eq(Region::getType, type);
+    public JsonResult<List<Region>> list(@ApiParam("1-国内 2-海外") int type,
+                                          @RequestParam(required = false) @ApiParam("父级区域") String regionParent){
+        LambdaQueryWrapper<Region> wrapper = new QueryWrapper<Region>().lambda().eq(Region::getType, type).orderByAsc(Region::getCode);
 
         if(StringUtils.isNotBlank(regionParent)){
             wrapper.eq(Region::getRegionParent,regionParent);
