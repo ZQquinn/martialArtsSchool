@@ -3,8 +3,11 @@ package com.tencent.wxcloudrun.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -15,6 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2022-06-07
  */
 @ApiModel(value = "Album对象", description = "相册")
+@Data
 public class Album implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -31,38 +35,8 @@ public class Album implements Serializable {
     @ApiModelProperty("相册封面")
     private String albumImgUrl;
 
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getAlbumName() {
-        return albumName;
-    }
-
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
-    }
-
-    public String getAlbumTag() {
-        return albumTag;
-    }
-
-    public void setAlbumTag(String albumTag) {
-        this.albumTag = albumTag;
-    }
-
-    public String getAlbumImgUrl() {
-        return albumImgUrl;
-    }
-
-    public void setAlbumImgUrl(String albumImgUrl) {
-        this.albumImgUrl = albumImgUrl;
-    }
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
 
     @Override
     public String toString() {

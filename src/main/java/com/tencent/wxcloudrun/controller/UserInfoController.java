@@ -81,11 +81,6 @@ public class UserInfoController {
             @ApiImplicitParam(name = "openId",value = "openId",dataTypeClass = String.class),
             @ApiImplicitParam(name = "phone",value = "手机号",dataTypeClass = String.class)
     })
-//    @DynamicResponseParameters(name = "CreateOrderHashMapModel",properties = {
-//            @DynamicParameter(name = "",value = "注解id",example = "X000111",required = true,dataTypeClass = Integer.class),
-//            @DynamicParameter(name = "name3",value = "订单编号-gson"),
-//            @DynamicParameter(name = "name1",value = "订单编号1-gson"),
-//    })
     public JsonResult userInfo( String openId,String phone) {
 
         UserInfo userInfo = userInfoService.getOne(new QueryWrapper<UserInfo>().lambda().eq(UserInfo::getOpenId, openId).eq(UserInfo::getPhone,phone));
@@ -98,7 +93,7 @@ public class UserInfoController {
 //    @UserLoginToken
     public JsonResult<List<UserInfo>> allUser() {
         QueryWrapper<UserInfo> userInfoQueryWrapper = new QueryWrapper<>();
-        userInfoQueryWrapper.lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagCheckMe,1).orderByDesc(UserInfo::getUpdateTime).last("limit 100");
+        userInfoQueryWrapper.lambda().select(UserInfo::getId,UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagCheckMe,1).orderByDesc(UserInfo::getUpdateTime).last("limit 100");
         return JsonResult.success(userInfoService.list(userInfoQueryWrapper));
     }
 
@@ -106,32 +101,36 @@ public class UserInfoController {
     @GetMapping("/usersByMajor")
     @ApiOperation("查询校友通过专业")
     @ApiImplicitParam(name = "majorCode",value = "专业编码",dataTypeClass = String.class)
-//    @UserLoginToken
     public JsonResult<List<UserInfo>> usersByMajor(String majorCode) {
         List<UserMajorRelation> userMajorRelations = userMajorRelationService.list(new QueryWrapper<UserMajorRelation>().lambda().eq(UserMajorRelation::getMajorCode, majorCode));
+        if (userMajorRelations.isEmpty()){
+            return JsonResult.success();
+        }
         List<Integer> userIds = userMajorRelations.stream().map(UserMajorRelation::getUserId).collect(Collectors.toList());
 
-        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagFindMe,1).in(UserInfo::getId, userIds).orderByDesc(UserInfo::getUpdateTime));
+        if (userIds.isEmpty()){
+            return JsonResult.success();
+        }
+
+        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getId,UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagFindMe,1).in(UserInfo::getId, userIds).orderByDesc(UserInfo::getUpdateTime));
         return JsonResult.success(list);
     }
 
     @GetMapping("/usersByRegion")
     @ApiOperation("查询校友通过区域")
-//    @UserLoginToken
     @ApiImplicitParam(name = "regionCode",value = "区域编码",dataTypeClass = String.class)
     public JsonResult<List<UserInfo>> usersByRegion(String regionCode) {
-        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::getIsFlagFindMe,1).in(UserInfo::getRegionCode, regionCode).orderByDesc(UserInfo::getUpdateTime));
+        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getId,UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagFindMe,1).in(UserInfo::getRegionCode, regionCode).orderByDesc(UserInfo::getUpdateTime));
 
         return JsonResult.success(list);
     }
 
     @GetMapping("/usersByYear")
     @ApiOperation("查询校友通过年份")
-//    @UserLoginToken
     @ApiImplicitParam(name = "year",value = "高考年份",dataTypeClass = String.class)
     public JsonResult<List<UserInfo>> usersByYear(String year) {
 
-        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,1).eq(UserInfo::getIsFlagFindMe,1).eq(UserInfo::getCollegeEntranceTime, year).orderByDesc(UserInfo::getUpdateTime));
+        List<UserInfo> list = userInfoService.list(new QueryWrapper<UserInfo>().lambda().select(UserInfo::getId,UserInfo::getUserName,UserInfo::getAvatarUrl).eq(UserInfo::getStatus,2).eq(UserInfo::getIsFlagFindMe,1).eq(UserInfo::getCollegeEntranceTime, year).orderByDesc(UserInfo::getUpdateTime));
 
         return JsonResult.success(list);
     }
@@ -145,17 +144,27 @@ public class UserInfoController {
 
     @GetMapping("/sameCityList")
     @ApiOperation("同城列表")
-    public JsonResult sameCityList(){
-        List<UserInfo> list = userInfoService.
+    public JsonResult<List<Region>> sameCityList(){
+        List<UserInfo> userInfos = userInfoService.
                 list(new QueryWrapper<UserInfo>().lambda().
                         groupBy(UserInfo::getRegionCode).orderByDesc(UserInfo::getRegionCode));
-        return JsonResult.success(list);
+
+        List<Region> regions = new ArrayList<>();
+        userInfos.forEach(userInfo -> {
+            UserInfoVo userInfoVo = new UserInfoVo();
+            BeanUtil.copyProperties(userInfo,userInfoVo);
+
+            Region region = regionService.getOne(new QueryWrapper<Region>().lambda().eq(Region::getCode, userInfo.getRegionCode()));
+
+            regions.add(region);
+        });
+
+        return JsonResult.success(regions);
     }
 
     @GetMapping("/getAlumnusInfo")
     @ApiOperation("观看校友信息")
     @ApiImplicitParam(name = "userId",value = "校友id",dataTypeClass = Integer.class)
-//    @UserLoginToken
     public JsonResult<List<UserInfo>> getAlumnusInfo(Integer userId) {
 
         UserInfoVo userInfoVo = new UserInfoVo();

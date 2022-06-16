@@ -17,4 +17,5 @@ public class WxPayV3Bean {
     private String apiKey;
     private String apiKey3;
     private String domain;
+    private String serialNo;
 }

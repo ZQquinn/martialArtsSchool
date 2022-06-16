@@ -48,6 +48,13 @@ public class JsonResult<T> implements Serializable {
         return result;
     }
 
+    public static <T> JsonResult<T> success(String msg) {
+        JsonResult<T> result = new JsonResult<>();
+        result.setCode(CommonEnum.SUCCESS.getResultCode());
+        result.setMsg(msg);
+        return result;
+    }
+
     public static <T> JsonResult<T> success(T data) {
         JsonResult<T> result = new JsonResult<>();
         result.setResultCode(CommonEnum.SUCCESS);
@@ -58,6 +65,13 @@ public class JsonResult<T> implements Serializable {
     public static <T> JsonResult<T> error(CommonEnum resultCode) {
         JsonResult<T> result = new JsonResult<>();
         result.setResultCode(resultCode);
+        return result;
+    }
+
+    public static <T> JsonResult<T> error(int code,String msg) {
+        JsonResult<T> result = new JsonResult<>();
+        result.setCode(code);
+        result.setMsg(msg);
         return result;
     }
 }

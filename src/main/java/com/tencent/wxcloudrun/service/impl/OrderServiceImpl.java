@@ -6,6 +6,7 @@ import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ijpay.core.kit.PayKit;
 import com.tencent.wxcloudrun.dto.OrderQueryDto;
 import com.tencent.wxcloudrun.dto.OrderRequestDto;
 import com.tencent.wxcloudrun.dto.OrderRequestSkuDto;
@@ -26,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.tencent.wxcloudrun.enums.OrderStatus.COMPLETE;
+import static com.tencent.wxcloudrun.enums.OrderStatus.*;
 
 /**
  * <p>
@@ -60,12 +61,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         //添加订单
         Address address = addressMapper.selectById(orderRequestDto.getAddressId());
         Integer userId = LocalCache.getInt("userId");
-        String outTradeNo = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(1, 100);
+        String outTradeNo = PayKit.generateStr();
 
         Order order = new Order();
         order.setOrderNo(outTradeNo);
         order.setUserId(userId);
-        order.setStatus(OrderStatus.UNPAY);
+        order.setStatus(UNPAY);
         order.setFreightPrice(new BigDecimal(orderRequestDto.getFreightPrice()));
         order.setPhone(address.getPhone());
         order.setConsignee(address.getConsignee());
@@ -106,7 +107,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
         try {
-            return wxPayService.jsApiPay(LocalCache.get("openId"));
+            return wxPayService.jsApiPay(LocalCache.get("openId"), outTradeNo);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,6 +125,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         List<Order> orders = this.baseMapper.selectList(new QueryWrapper<Order>().lambda().eq(Order::getUserId, userId).eq(Order::getOrderNo, orderQueryDto.getOutTradeNo()));
 
+        orders.forEach(order -> {
+            JSONObject jsonObject = wxPayService.queryOrder(order.getOrderNo());
+            if (jsonObject.get("trade_state").equals("CLOSED") && order.getStatus().equals(UNPAY)) {
+                order.setStatus(CANCELED);
+                this.updateById(order);
+            }
+        });
         return orders;
     }
 
@@ -131,15 +139,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return wxPayService.queryOrder(outTradeNo);
     }
 
-    public BigDecimal  countFreight(String code, BigDecimal actualPrice){
+    public BigDecimal countFreight(String code, BigDecimal actualPrice) {
         ArrayList<String> codes = new ArrayList<>();
 
-
-        if(actualPrice.compareTo(new BigDecimal("99")) == 1){
+        if (actualPrice.compareTo(new BigDecimal("99")) == 1) {
             return new BigDecimal("0.00");
         }
 
-        if(codes.contains(code)){
+        if (codes.contains(code)) {
             return new BigDecimal("8.00");
         }
 
@@ -158,7 +165,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
 
-    private List<Order> allOrderPage(OrderQueryDto orderQueryDto){
+    private List<Order> allOrderPage(OrderQueryDto orderQueryDto) {
 //        this.baseMapper
         return null;
 

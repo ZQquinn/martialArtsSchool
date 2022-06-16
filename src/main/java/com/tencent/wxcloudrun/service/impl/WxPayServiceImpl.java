@@ -5,10 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ijpay.core.IJPayHttpResponse;
 import com.ijpay.core.enums.RequestMethod;
 import com.ijpay.core.kit.HttpKit;
-import com.ijpay.core.kit.PayKit;
 import com.ijpay.core.kit.WxPayKit;
 import com.ijpay.core.utils.DateTimeZoneUtil;
 import com.ijpay.wxpay.WxPayApi;
@@ -17,18 +18,21 @@ import com.ijpay.wxpay.enums.WxDomain;
 import com.ijpay.wxpay.model.v3.Amount;
 import com.ijpay.wxpay.model.v3.Payer;
 import com.ijpay.wxpay.model.v3.UnifiedOrderModel;
-import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.component.WxPayV3Bean;
-import org.apache.commons.lang3.StringUtils;
+import com.tencent.wxcloudrun.entity.Order;
+import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.X509Certificate;
+import java.security.PrivateKey;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.tencent.wxcloudrun.enums.OrderStatus.WAITING_SHIPPED;
 
 @Service
 public class WxPayServiceImpl {
@@ -36,13 +40,18 @@ public class WxPayServiceImpl {
     @Resource
     WxPayV3Bean wxPayV3Bean;
 
-    public Object jsApiPay(String openId) throws Exception {
+    @Autowired
+    private OrderServiceImpl orderService;
+
+    public Object jsApiPay(String openId,String outTradeNo) throws Exception {
+
+        PrivateKey merchantPrivateKey = PemUtil.loadPrivateKey(FileUtil.readUtf8String(wxPayV3Bean.getKeyPath()));
         String timeExpire = DateTimeZoneUtil.dateToTimeZone(System.currentTimeMillis() + 1000 * 60 * 3);
         UnifiedOrderModel unifiedOrderModel = new UnifiedOrderModel()
                 .setAppid(wxPayV3Bean.getAppId())
                 .setMchid(wxPayV3Bean.getMchId())
                 .setDescription("IJPay 让支付触手可及")
-                .setOut_trade_no(PayKit.generateStr())
+                .setOut_trade_no(outTradeNo)
                 .setTime_expire(timeExpire)
                 .setAttach("微信系开发脚手架 https://gitee.com/javen205/TNWX")
                 .setNotify_url(wxPayV3Bean.getDomain().concat("/v3/payNotify"))
@@ -54,22 +63,22 @@ public class WxPayServiceImpl {
                 WxDomain.CHINA.toString(),
                 WxApiType.JS_API_PAY.toString(),
                 wxPayV3Bean.getMchId(),
-                getSerialNumber(),
+                wxPayV3Bean.getSerialNo(),
                 null,
-                wxPayV3Bean.getKeyPath(),
+                merchantPrivateKey,
                 JSONUtil.toJsonStr(unifiedOrderModel)
         );
 
         if (response.getStatus() == 200) {
             // 根据证书序列号查询对应的证书来验证签名结果
-            boolean verifySignature = WxPayKit.verifySignature(response, wxPayV3Bean.getPlatformCertPath());
-            if (verifySignature) {
-                String body = response.getBody();
-                JSONObject jsonObject = JSONUtil.parseObj(body);
-                String prepayId = jsonObject.getStr("prepay_id");
-                Map<String, String> map = WxPayKit.jsApiCreateSign(wxPayV3Bean.getAppId(), prepayId, wxPayV3Bean.getKeyPath());
-                return map;
-            }
+//            boolean verifySignature = WxPayKit.verifySignature(response, wxPayV3Bean.getPlatformCertPath());
+//            if (verifySignature) {
+            String body = response.getBody();
+            JSONObject jsonObject = JSONUtil.parseObj(body);
+            String prepayId = jsonObject.getStr("prepay_id");
+            Map<String, String> map = WxPayKit.jsApiCreateSign(wxPayV3Bean.getAppId(), prepayId, wxPayV3Bean.getKeyPath());
+            return map;
+//            }
         }
         return response;
     }
@@ -93,14 +102,11 @@ public class WxPayServiceImpl {
             response.setStatus(200);
             map.put("code", "SUCCESS");
             map.put("message", "SUCCESS");
-
-
-
-            //订单业务状态更改
-
-
-
-
+            com.alibaba.fastjson.JSONObject parseObject = JSON.parseObject(plainText);
+            //订单业务状态更改 成功
+            UpdateWrapper<Order> orderUpdateWrapper = new UpdateWrapper<>();
+            orderUpdateWrapper.lambda().eq(Order::getOrderNo,parseObject.get("out_trade_no")).set(Order::getStatus,WAITING_SHIPPED);
+            orderService.update(orderUpdateWrapper);
         } else {
             response.setStatus(500);
             map.put("code", "ERROR");
@@ -123,7 +129,7 @@ public class WxPayServiceImpl {
                     WxDomain.CHINA.toString(),
                     String.format(WxApiType.ORDER_QUERY_BY_NO.toString(), outTradeNo),
                     wxPayV3Bean.getMchId(),
-                    getSerialNumber(),
+                    wxPayV3Bean.getSerialNo(),
                     null,
                     wxPayV3Bean.getKeyPath(),
                     JSONUtil.toJsonStr(unifiedOrderModel)
@@ -137,22 +143,4 @@ public class WxPayServiceImpl {
 
     }
 
-
-    private String getSerialNumber() {
-        // 获取证书序列号
-        X509Certificate certificate = PayKit.getCertificate(FileUtil.getInputStream(wxPayV3Bean.getCertPath()));
-        String serialNo = certificate.getSerialNumber().toString(16).toUpperCase();
-
-//            System.out.println("输出证书信息:\n" + certificate.toString());
-//            // 输出关键信息，截取部分并进行标记
-//            System.out.println("证书序列号:" + certificate.getSerialNumber().toString(16));
-//            System.out.println("版本号:" + certificate.getVersion());
-//            System.out.println("签发者：" + certificate.getIssuerDN());
-//            System.out.println("有效起始日期：" + certificate.getNotBefore());
-//            System.out.println("有效终止日期：" + certificate.getNotAfter());
-//            System.out.println("主体名：" + certificate.getSubjectDN());
-//            System.out.println("签名算法：" + certificate.getSigAlgName());
-//            System.out.println("签名：" + certificate.getSignature().toString());
-        return serialNo;
-    }
 }

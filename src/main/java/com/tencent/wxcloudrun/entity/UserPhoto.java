@@ -36,7 +36,7 @@ public class UserPhoto implements Serializable {
     @ApiModelProperty("照片url")
     private String img;
 
-    @ApiModelProperty("状态 1-上传 2-审核 3-发布")
+    @ApiModelProperty("状态 1-上传完成 2-审核中 ")
     private Integer status;
 
     @ApiModelProperty("相册id")

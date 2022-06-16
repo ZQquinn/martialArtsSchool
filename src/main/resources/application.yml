@@ -38,14 +38,23 @@ mybatis-plus:
 
 wxpay:
   appId: wx40aef2a640a5077a
-  keyPath: key.pem
-  certPath: cert.pem
-  certP12Path: cert.p12
-  platformCertPath: wx_cert.pem
+  keyPath: apiclient_key.pem
+  certPath: apiclient_cert.pem
+  certP12Path: apiclient_cert.p12
+#  platformCertPath: wx_cert.pem
   mchId: 1625995235
-  apiKey3: Api-v3 \u5BC6\u94A5
-  apiKey: Api \u5BC6\u94A5
+  apiKey3: brLrxjQnVx08GCAgPsfCgUG6FIDTS6lI
+  apiKey: brLrxjQnVx08GCAgPsfCgUG6FIDTS6lI
   domain: https://ijpay.javen.com
+  serialNo: 6E2E0008FE9E944E5BBC8A2908D04C29AB5F2EF2
+
+wxpay2:
+  appId: wx40aef2a640a5077a
+  appSecret: a1d975738a46cef50bdcb02ede86208a
+  mchId: 1625995235
+  certPath: apiclient_cert.pem
+  domain: https://ijpay.javen.com
+
 
 
 wx:

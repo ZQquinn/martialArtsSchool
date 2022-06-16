@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tencent.wxcloudrun.mapper.OrderMapper">
+
+
+<!--    <resultMap id="orderMap" type="com.tencent.wxcloudrun.entity.Order">-->
+<!--        <id column="id" javaType="id"></id>-->
+<!--        <result column="channel" javaType="channel"></result>-->
+<!--        <result column="parent_order_no" javaType="parentOrderNo"></result>-->
+<!--        <result column="order_no" javaType="orderNo"></result>-->
+<!--        <result column="freight_price" javaType="freightPrice"></result>-->
+<!--        <result column="price" javaType="price"></result>-->
+<!--        <result column="pay_price" javaType="payPrice"></result>-->
+<!--        <result column="pay_id" javaType="payId"></result>-->
+<!--        <result column="app_id" javaType="appId"></result>-->
+<!--        <result column="ship_no" javaType="shipNo"></result>-->
+<!--        <result column="phone" javaType="phone"></result>-->
+<!--        <result column="consignee" javaType="consignee"></result>-->
+<!--        <result column="mono" javaType="mono"></result>-->
+<!--        <result column="admin_mono" javaType="adminMono"></result>-->
+<!--        <result column="refund_reason" javaType="refundReason"></result>-->
+<!--        <result column="order_time" javaType="orderTime"></result>-->
+<!--        <result column="pay_time" javaType="payTime"></result>-->
+<!--        <result column="gmt_ship" javaType="gmtShip"></result>-->
+<!--        <result column="gmt_confirm" javaType="gmtConfirm"></result>-->
+<!--        <result column="create_time" javaType="createTime"></result>-->
+<!--        <result column="update_time" javaType="updateTime"></result>-->
+<!--        <collection property="orderSkuList" javaType="java.util.List" ofType="com.tencent.wxcloudrun.entity.OrderSku">-->
+<!--            <id column="order_sku_id" javaType="id"></id>-->
+<!--            <result column="order_sku_id" javaType="skuId"></result>-->
+<!--            <result column="order_sku_id" javaType="orderId"></result>-->
+<!--            <result column="order_sku_id" javaType="orderNo"></result>-->
+<!--            <result column="order_sku_id" javaType="skuTitle"></result>-->
+<!--            <result column="order_sku_id" javaType="num"></result>-->
+<!--            <result column="order_sku_id" javaType="price"></result>-->
+<!--            <result column="order_sku_id" javaType="img"></result>-->
+<!--            <result column="order_sku_id" javaType="unit"></result>-->
+<!--            <result column="order_sku_id" javaType="weight"></result>-->
+<!--            &lt;!&ndash;            <collection property="s">  </collection>&ndash;&gt;-->
+<!--        </collection>-->
+<!--    </resultMap>-->
+
+<!--    <select id="selectOrderPages" resultMap="orderMap">-->
+<!--        SELECT-->
+<!--            *-->
+<!--        FROM-->
+<!--            `order` LEFT JOIN order_sku on `order`.id = order_sku.order_id-->
+
+<!--        <where>-->
+<!--            <if test="orderQueryDto.param != '' and orderQueryDto.param != null ">-->
+<!--                `order`.-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
+
+<!--    <select id="selectOrderSku" resultType="com.tencent.wxcloudrun.entity.OrderSku">-->
+<!--        SELECT *-->
+<!--        FROM order_sku-->
+<!--        where order_id = #{order_id}-->
+<!--    </select>-->
+
+<!--    <select id="selectSkuAttributes" resultType="com.tencent.wxcloudrun.entity.SkuAttributes">-->
+<!--        SELECT *-->
+<!--        FROM `sku_attributes`-->
+<!--        where sku_id = #{sku_id}-->
+<!--    </select>-->
+
+
+    <!--    <select id="skuAttributes" resultType="com.tencent.wxcloudrun.entity.SkuAttributes">-->
+    <!--        select * from sku_attributes where sku_id = #{sku_id}-->
+    <!--    </select>-->
+
+
+    <!--    <select id="orderSku" resultType="com.tencent.wxcloudrun.entity.OrderSku">-->
+    <!--        select * from order_sku where order_id = #{order_id}-->
+    <!--    </select>-->
+
+
+</mapper>

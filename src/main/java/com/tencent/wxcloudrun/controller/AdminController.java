@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.*;
+import com.tencent.wxcloudrun.mapper.AddressMapper;
 import com.tencent.wxcloudrun.service.impl.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.tencent.wxcloudrun.exception.CommonEnum.LOGIN_FAIL;
 
 @RestController
 @RequestMapping("/admin")
@@ -54,6 +58,22 @@ public class AdminController {
 
     @Autowired
     private OrderServiceImpl orderService;
+
+    @Autowired
+    private AdminServiceImpl adminService;
+
+
+    @PostMapping("/login")
+    @ApiOperation("管理员登陆")
+    public JsonResult login(String userName, String password) {
+
+        Admin admin = adminService.getOne(new QueryWrapper<Admin>().lambda().eq(Admin::getUserName, userName).eq(Admin::getPassword, password));
+
+        if (null == admin) {
+            JsonResult.error(LOGIN_FAIL);
+        }
+        return JsonResult.success("登陆成功");
+    }
 
 
     @PostMapping("/user/page")
@@ -247,7 +267,6 @@ public class AdminController {
         }
 
 
-
         if (StringUtils.isNotBlank(orderQueryDto.getStartTime())) {
             orderQueryWrapper.lambda().between(Order::getOrderTime, orderQueryDto.getStartTime(), orderQueryDto.getEndTime());
         }
@@ -256,8 +275,8 @@ public class AdminController {
             orderQueryWrapper.lambda().in(Order::getId, orderSkus.stream().map(OrderSku::getOrderId).collect(Collectors.toList()));
         }
 
-        if(null != orderQueryDto.getStatus()){
-            orderQueryWrapper.lambda().eq(Order::getStatus,orderQueryDto.getStatus());
+        if (null != orderQueryDto.getStatus()) {
+            orderQueryWrapper.lambda().eq(Order::getStatus, orderQueryDto.getStatus());
         }
 
         Page<Order> orders = orderService.page(orderQueryDto.getPagePlus(), orderQueryWrapper);
@@ -276,18 +295,24 @@ public class AdminController {
 
     @GetMapping("/order/detail")
     @ApiOperation("订单详情")
-    public JsonResult orderDetail(Integer id){
+    public JsonResult orderDetail(Integer id) {
 
         Order order = orderService.getById(id);
 
         List<OrderSku> orderSkus = orderSkuService.list(new QueryWrapper<OrderSku>().lambda().eq(OrderSku::getOrderId, order.getId()));
 
         orderSkus.forEach(orderSku -> {
-            orderSku.setSkuAttributes(skuAttributesService.list(new QueryWrapper<SkuAttributes>().lambda().eq(SkuAttributes::getSkuId,orderSku.getSkuId())));
-            orderSku.setSkuImgs(skuImgService.list(new QueryWrapper<SkuImg>().lambda().eq(SkuImg::getSkuId,orderSku.getSkuId())));
+            orderSku.setSkuAttributes(skuAttributesService.list(new QueryWrapper<SkuAttributes>().lambda().eq(SkuAttributes::getSkuId, orderSku.getSkuId())));
+            orderSku.setSkuImgs(skuImgService.list(new QueryWrapper<SkuImg>().lambda().eq(SkuImg::getSkuId, orderSku.getSkuId())));
         });
 
         return JsonResult.success(orderSkus);
+    }
+
+    @PostMapping("/order/update")
+    @ApiOperation("更新订单")
+    public JsonResult updateOrder(@RequestBody Order order){
+        return JsonResult.success(orderService.updateById(order));
     }
 
 

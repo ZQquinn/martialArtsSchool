@@ -17,9 +17,10 @@ public enum CommonEnum implements BaseErrorInfoInterface{
     TOKEN_CHECK_FAILED(10003, "token验证失败"),
 
 
+
     NO_REGISTER(10004, "此功能仅限注册用户"),
     NO_ALLOW_CHECK(10005, "对方很含羞隐藏了信息"),
-
+    LOGIN_FAIL(10006,"登陆失败，用户名密码错误");
     ;
 
     /** 错误码 */

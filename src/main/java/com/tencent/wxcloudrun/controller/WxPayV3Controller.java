@@ -49,7 +49,7 @@ public class WxPayV3Controller {
     @SneakyThrows
     @PostMapping("/jsApiPay")
     public JsonResult jsApiPay(String openId) {
-        return JsonResult.success(wxPayService.jsApiPay(openId));
+        return JsonResult.success(wxPayService.jsApiPay(openId,PayKit.generateStr()));
     }
 
 

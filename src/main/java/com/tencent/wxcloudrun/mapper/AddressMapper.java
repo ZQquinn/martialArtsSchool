@@ -2,6 +2,7 @@ package com.tencent.wxcloudrun.mapper;
 
 import com.tencent.wxcloudrun.entity.Address;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.tencent.wxcloudrun.entity.Admin;
 import org.apache.ibatis.annotations.Mapper;
 
 import javax.annotation.Resource;
