@@ -3,6 +3,9 @@ package com.tencent.wxcloudrun.controller;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
 import com.tencent.wxcloudrun.common.entity.JsonResult;
 import com.tencent.wxcloudrun.config.WxMaConfiguration;
 import io.swagger.annotations.Api;
@@ -50,7 +53,7 @@ public class WxController {
         final WxMaService wxService = WxMaConfiguration.getMaService(appId);
 
         try {
-            return JsonResult.success(wxService.getAccessToken(true));
+            return JsonResult.success(wxService.getAccessToken());
         } catch (WxErrorException e) {
             e.printStackTrace();
         }
@@ -64,12 +67,12 @@ public class WxController {
     @ApiOperation("获取微信手机号")
     public JsonResult getPhone(String accessToken, String code) {
 
-        HashMap<String, Object> paramMap = new HashMap<>();
+        JSONObject body = new JSONObject();
 //        paramMap.put("access_token", accessToken);
-        paramMap.put("code", code);
+        body.put("code", code);
 
-        String result = HttpUtil.post("https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + accessToken, paramMap);
-        return JsonResult.success(result);
+        String result = HttpUtil.post("https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + accessToken, body.toJSONString());
+        return JsonResult.success(JSON.parseObject(result));
 
     }
 }

@@ -48,12 +48,12 @@ public class JsonResult<T> implements Serializable {
         return result;
     }
 
-    public static <T> JsonResult<T> success(String msg) {
-        JsonResult<T> result = new JsonResult<>();
-        result.setCode(CommonEnum.SUCCESS.getResultCode());
-        result.setMsg(msg);
-        return result;
-    }
+//    public static <T> JsonResult<T> success(String msg) {
+//        JsonResult<T> result = new JsonResult<>();
+//        result.setCode(CommonEnum.SUCCESS.getResultCode());
+//        result.setMsg(msg);
+//        return result;
+//    }
 
     public static <T> JsonResult<T> success(T data) {
         JsonResult<T> result = new JsonResult<>();

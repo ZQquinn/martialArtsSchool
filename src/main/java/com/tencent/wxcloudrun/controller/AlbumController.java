@@ -10,6 +10,7 @@ import com.tencent.wxcloudrun.service.impl.AlbumServiceImpl;
 import com.tencent.wxcloudrun.service.impl.UserPhotoServiceImpl;
 import com.tencent.wxcloudrun.utils.LocalCache;
 import com.tencent.wxcloudrun.vo.AlbumVo;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/album")
+@Api(tags = "相册管理")
 public class AlbumController {
 
     @Autowired

@@ -93,31 +93,6 @@ public class UserInfo implements Serializable {
 
     @ApiModelProperty("专业集合")
     @TableField(exist = false)
-    private List<String> majorCodes;
+    private List<Major> majors;
 
-
-    @Override
-    public String toString() {
-        return "UserInfo{" +
-        "id=" + id +
-        ", openId=" + openId +
-        ", phone=" + phone +
-        ", userName=" + userName +
-        ", schoolAt=" + schoolAt +
-        ", majorCode=" + majorCodes +
-        ", collegeEntranceTime=" + collegeEntranceTime +
-        ", graduateSchool=" + graduateSchool +
-        ", region=" + region +
-        ", cityCode=" + regionCode +
-        ", workUnit=" + workUnit +
-        ", industry=" + industry +
-        ", job=" + job +
-        ", profile=" + profile +
-        ", rewark=" + rewark +
-        ", avatarUrl=" + avatarUrl +
-        ", status=" + status +
-        ", createTime=" + createTime +
-        ", updateTime=" + updateTime +
-        "}";
-    }
 }

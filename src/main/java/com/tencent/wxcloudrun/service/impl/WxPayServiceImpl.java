@@ -69,6 +69,9 @@ public class WxPayServiceImpl {
                 JSONUtil.toJsonStr(unifiedOrderModel)
         );
 
+
+//        System.out.println(PayKit.getPrivateKey(wxPayV3Bean.getKeyPath()));
+
         if (response.getStatus() == 200) {
             // 根据证书序列号查询对应的证书来验证签名结果
 //            boolean verifySignature = WxPayKit.verifySignature(response, wxPayV3Bean.getPlatformCertPath());
@@ -76,7 +79,7 @@ public class WxPayServiceImpl {
             String body = response.getBody();
             JSONObject jsonObject = JSONUtil.parseObj(body);
             String prepayId = jsonObject.getStr("prepay_id");
-            Map<String, String> map = WxPayKit.jsApiCreateSign(wxPayV3Bean.getAppId(), prepayId, wxPayV3Bean.getKeyPath());
+            Map<String, String> map = WxPayKit.miniAppPrepayIdCreateSign(wxPayV3Bean.getAppId(), prepayId, "",null);
             return map;
 //            }
         }
